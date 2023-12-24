@@ -51,8 +51,37 @@ async function run() {
 
     //tasks related
     app.get('/tasks', async(req, res)=>{
-      const result = await taskCollection.find().toArray();
+      const email = req.query.email;
+      const result = await taskCollection.find({email}).toArray();
       res.send(result);
+    })
+
+    app.post('/tasks', async(req, res)=>{
+      const addedTask = req.body;
+      console.log(addedTask);
+      const result = await taskCollection.insertOne(addedTask);
+      res.send(result);
+    })
+
+    app.delete('/tasks/:id', async(req, res)=>{
+      const id = req.params.id;
+      console.log(id);
+      const query = { id: id }
+      const result = await taskCollection.deleteOne(query);
+      res.send(result);
+    })
+    app.patch('/tasks/:id', async(req, res)=>{
+      const id = req.params.id;
+      const status = req.body.status;
+      console.log(id, status);
+      const filter = { id: id }
+      const updatedDoc = {
+            $set: {
+              status: status
+            }
+          }
+          const result = await taskCollection.updateOne(filter, updatedDoc);
+          res.send(result);
     })
 
     // app.delete('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
